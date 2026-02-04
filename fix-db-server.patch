@@ -1,0 +1,295 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: you <you@example.com>
+Date: Mon, 08 Dec 2025 00:00:00 +0000
+Subject: [PATCH] Add DB helper, fix server startup, normalize .env.example
+
+---
+ .env.example           | 11 +++++++++++
+ config/db.js           | 27 +++++++++++++++++++++++++++
+ server.js              | 21 +++++++++++++++++++++
+ 3 files changed, 59 insertions(+)
+ create mode 100644 config/db.js
+ create mode 100644 .env.example
+-- 
+1.8.3.1
+
+*** Begin Patch
+*** Add File: config/db.js
++const mongoose = require('mongoose');
++
++async function connectDB(uri) {
++  if (!uri) {
++    throw new Error('MONGODB_URI not provided');
++  }
++  try {
++    await mongoose.connect(uri, {
++      useNewUrlParser: true,
++      useUnifiedTopology: true,
++    });
++    console.log('MongoDB connected');
++  } catch (err) {
++    console.error('MongoDB connection error:', err);
++    process.exit(1);
++  }
++}
++
++module.exports = connectDB;
++
+*** End Patch
+*** Begin Patch
+*** Add File: .env.example
++# MongoDB connection (example)
++MONGODB_URI=mongodb://<username>:<password>@localhost:27017/digitalpass
++
++# App port
++PORT=3000
++
++# JWT secret for auth (use a strong secret in production)
++JWT_SECRET=your_jwt_secret_key
++
+*** End Patch
+*** Begin Patch
+*** Update File: server.js
+@@
+-require("dotenv").config();
+-const connectDB = require('./config/db');
+-
+-const express = require("express");
+-const http = require("http");
+-const cors = require("cors");
+-
+-const app = express();
+-app.use(cors());
+-app.use(express.json());
+-
+-connectDB(process.env.MONGO_URI);
+-
+-app.get("/", (req, res) => {
+-  res.send("Digital Pass Backend Running");
+-});
+-
+-const PORT = process.env.PORT || 3000;
+-
+-server.listen(PORT, '0.0.0.0', () => {
+-  console.log(`Server running on port ${PORT}`);
+-});
++require("dotenv").config();
++const connectDB = require('./config/db');
++
++const express = require("express");
++const http = require("http");
++const cors = require("cors");
++
++const app = express();
++app.use(cors());
++app.use(express.json());
++
++// Connect to MongoDB using the same env key as in .env/.env.example
++connectDB(process.env.MONGODB_URI);
++
++app.get("/", (req, res) => {
++  res.send("Digital Pass Backend Running");
++});From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: you <you@example.com>
+Date: Mon, 08 Dec 2025 00:00:00 +0000
+Subject: [PATCH] Add DB helper, fix server startup, normalize .env.example
+
+---
+ .env.example           | 11 +++++++++++
+ config/db.js           | 27 +++++++++++++++++++++++++++
+ server.js              | 21 +++++++++++++++++++++
+ 3 files changed, 59 insertions(+)
+ create mode 100644 config/db.js
+ create mode 100644 .env.example
+-- 
+1.8.3.1
+
+*** Begin Patch
+*** Add File: config/db.js
++const mongoose = require('mongoose');
++
++async function connectDB(uri) {
++  if (!uri) {
++    throw new Error('MONGODB_URI not provided');
++  }
++  try {
++    await mongoose.connect(uri, {
++      useNewUrlParser: true,
++      useUnifiedTopology: true,
++    });
++    console.log('MongoDB connected');
++  } catch (err) {
++    console.error('MongoDB connection error:', err);
++    process.exit(1);
++  }
++}
++
++module.exports = connectDB;
++
+*** End Patch
+*** Begin Patch
+*** Add File: .env.example
++# MongoDB connection (example)
++MONGODB_URI=mongodb://<username>:<password>@localhost:27017/digitalpass
++
++# App port
++PORT=3000
++
++# JWT secret for auth (use a strong secret in production)
++JWT_SECRET=your_jwt_secret_key
++
+*** End Patch
+*** Begin Patch
+*** Update File: server.js
+@@
+-require("dotenv").config();
+-const connectDB = require('./config/db');
+-
+-const express = require("express");
+-const http = require("http");
+-const cors = require("cors");
+-
+-const app = express();
+-app.use(cors());
+-app.use(express.json());
+-
+-connectDB(process.env.MONGO_URI);
+-
+-app.get("/", (req, res) => {
+-  res.send("Digital Pass Backend Running");
+-});
+-
+-const PORT = process.env.PORT || 3000;
+-
+-server.listen(PORT, '0.0.0.0', () => {
+-  console.log(`Server running on port ${PORT}`);
+-});
++require("dotenv").config();
++const connectDB = require('./config/db');
++
++const express = require("express");
++const http = require("http");
++const cors = require("cors");
++
++const app = express();
++app.use(cors());
++app.use(express.json());
++
++// Connect to MongoDB using the same env key as in .env/.env.example
++connectDB(process.env.MONGODB_URI);
++
++app.get("/", (req, res) => {
++  res.send("Digital Pass Backend Running");
++});
++
++// create the HTTP server and start listening
++const server = http.createServer(app);
++
++const PORT = process.env.PORT || 3000;
++
++server.listen(PORT, '0.0.0.0', () => {
++  console.log(`Server running on port ${PORT}`);
++});
+*** End PatchFrom 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: you <you@example.com>
+Date: Mon, 08 Dec 2025 00:00:00 +0000
+Subject: [PATCH] Add DB helper, fix server startup, normalize .env.example
+
+---
+ .env.example           | 11 +++++++++++
+ config/db.js           | 27 +++++++++++++++++++++++++++
+ server.js              | 21 +++++++++++++++++++++
+ 3 files changed, 59 insertions(+)
+ create mode 100644 config/db.js
+ create mode 100644 .env.example
+-- 
+1.8.3.1
+
+*** Begin Patch
+*** Add File: config/db.js
++const mongoose = require('mongoose');
++
++async function connectDB(uri) {
++  if (!uri) {
++    throw new Error('MONGODB_URI not provided');
++  }
++  try {
++    await mongoose.connect(uri, {
++      useNewUrlParser: true,
++      useUnifiedTopology: true,
++    });
++    console.log('MongoDB connected');
++  } catch (err) {
++    console.error('MongoDB connection error:', err);
++    process.exit(1);
++  }
++}
++
++module.exports = connectDB;
++
+*** End Patch
+*** Begin Patch
+*** Add File: .env.example
++# MongoDB connection (example)
++MONGODB_URI=mongodb://<username>:<password>@localhost:27017/digitalpass
++
++# App port
++PORT=3000
++
++# JWT secret for auth (use a strong secret in production)
++JWT_SECRET=your_jwt_secret_key
++
+*** End Patch
+*** Begin Patch
+*** Update File: server.js
+@@
+-require("dotenv").config();
+-const connectDB = require('./config/db');
+-
+-const express = require("express");
+-const http = require("http");
+-const cors = require("cors");
+-
+-const app = express();
+-app.use(cors());
+-app.use(express.json());
+-
+-connectDB(process.env.MONGO_URI);
+-
+-app.get("/", (req, res) => {
+-  res.send("Digital Pass Backend Running");
+-});
+-
+-const PORT = process.env.PORT || 3000;
+-
+-server.listen(PORT, '0.0.0.0', () => {
+-  console.log(`Server running on port ${PORT}`);
+-});
++require("dotenv").config();
++const connectDB = require('./config/db');
++
++const express = require("express");
++const http = require("http");
++const cors = require("cors");
++
++const app = express();
++app.use(cors());
++app.use(express.json());
++
++// Connect to MongoDB using the same env key as in .env/.env.example
++connectDB(process.env.MONGODB_URI);
++
++app.get("/", (req, res) => {
++  res.send("Digital Pass Backend Running");
++});
++
++// create the HTTP server and start listening
++const server = http.createServer(app);
++
++const PORT = process.env.PORT || 3000;
++
++server.listen(PORT, '0.0.0.0', () => {
++  console.log(`Server running on port ${PORT}`);
++});
+*** End Patch
+Patch
