@@ -3,15 +3,23 @@ const Teacher = require("../models/Teacher");
 
 const router = express.Router();
 
+function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 //Filter teachers by subject and/or name (case-insensitive)
 router.get("/", async (req, res) => {
     try {
         const query = {};
-        if (req.query.subject ) {
-            query.subject = req.query.subject;
+        if (req.query.subject) {
+            const safeSubject = escapeRegex(req.query.subject.trim());
+            query.subject = { $regex: `^${safeSubject}$`, $options: "i" };
         }
-        if (req.query.name) {
-            query.firstName = { $regex: req.query.name, $options: "i" };
+
+        const nameInput = req.query.firstName || req.query.name;
+        if (nameInput) {
+            const safeName = escapeRegex(nameInput.trim());
+            query.firstName = { $regex: safeName, $options: "i" };
         }
 
         const teachers = await Teacher.find(query);
