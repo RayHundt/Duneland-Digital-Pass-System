@@ -16,10 +16,40 @@ router.get("/", async (req, res) => {
             query.subject = { $regex: `^${safeSubject}$`, $options: "i" };
         }
 
-        const nameInput = req.query.firstName || req.query.name;
-        if (nameInput) {
-            const safeName = escapeRegex(nameInput.trim());
+        const FirstNameInput = req.query.firstName || req.query.firstname;
+        const LastNameInput = req.query.lastName || req.query.lastname;
+        const nameInput = req.query.name;
+
+        if (FirstNameInput) {
+            const safeName = escapeRegex(FirstNameInput.trim());
             query.firstName = { $regex: safeName, $options: "i" };
+        }
+
+        
+        if (LastNameInput) {
+            const safeName = escapeRegex(LastNameInput.trim());
+            query.lastName = { $regex: safeName, $options: "i" };
+        }
+
+        if(nameInput) {
+            const trimmedName = nameInput.trim();
+            if(!trimmedName) {
+                const teachers = await Teacher.find(query);
+                return res.json(teachers);
+            }
+            const nameParts = trimmedName.split(/\s+/).filter(Boolean);
+            if(nameParts.length >= 2) {
+                const safeFirst = escapeRegex(nameParts[0]);
+                const safeLast = escapeRegex(nameParts.slice(1).join(" "));
+                query.firstName = { $regex: `^${safeFirst}$`, $options: "i" };
+                query.lastName = { $regex: `^${safeLast}$`, $options: "i" };
+            } else {
+                const safeName = escapeRegex(trimmedName);
+                query.$or = [
+                    { firstName: { $regex: safeName, $options: "i" } },
+                    { lastName: { $regex: safeName, $options: "i" } }
+                ];
+            }
         }
 
         const teachers = await Teacher.find(query);

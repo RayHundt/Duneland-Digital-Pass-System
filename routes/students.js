@@ -3,6 +3,10 @@ const Student = require("../models/Student");
 
 const router = express.Router(); 
 
+function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 //Filter students by grade and/or name (case-insensitive)
 router.get("/", async (req, res) => {
     try {
@@ -10,8 +14,40 @@ router.get("/", async (req, res) => {
         if (req.query.grade) {
             query.grade = Number(req.query.grade);
         }
-        if (req.query.name) {
-            query.firstName = { $regex: req.query.name, $options: "i" };
+
+        const firstNameInput = req.query.firstName || req.query.firstname;
+        const lastNameInput = req.query.lastName || req.query.lastname;
+        const nameInput = req.query.name;
+
+        if (firstNameInput) {
+            const safeName = escapeRegex(firstNameInput.trim());
+            query.firstName = { $regex: safeName, $options: "i" };
+        }
+
+        if (lastNameInput) {
+            const safeName = escapeRegex(lastNameInput.trim());
+            query.lastName = { $regex: safeName, $options: "i" };
+        }
+
+        if (nameInput) {
+            const trimmedName = nameInput.trim();
+            if(!trimmedName) {
+                const students = await Student.find(query);
+                return res.json(students);
+            }
+            const nameParts = trimmedName.split(/\s+/).filter(Boolean);
+            if (nameParts.length >= 2) {
+                const safeFirst = escapeRegex(nameParts[0]);
+                const safeLast = escapeRegex(nameParts.slice(1).join(" "));
+                query.firstName = { $regex: `^${safeFirst}$`, $options: "i" };
+                query.lastName = { $regex: `^${safeLast}$`, $options: "i" };
+            } else {
+                const safeName = escapeRegex(trimmedName);
+                query.$or = [
+                    { firstName: { $regex: safeName, $options: "i" } },
+                    { lastName: { $regex: safeName, $options: "i" } }
+                ];
+            }
         }
 
         const students = await Student.find(query);
@@ -22,7 +58,7 @@ router.get("/", async (req, res) => {
 });
 
 //seed route to add sample students to the database
-router.get ("/seed", async (req, res) => {
+/*router.get ("/seed", async (req, res) => {
     try {
         await Student.deleteMany({}); // Clear existing students
 
@@ -41,6 +77,6 @@ router.get ("/seed", async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-});
+});*/
 
 module.exports = router;
