@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
 const connectDB = require("./config/db");
 const path = require("path");
 
@@ -22,19 +21,11 @@ app.get("/", (req, res) => {
 
 const studentsRoutePath = path.join(__dirname, "routes", "students.js");
 console.log("Loading students route from:", studentsRoutePath);
-if (fs.existsSync(studentsRoutePath)) {
-  app.use("/api/students", require(studentsRoutePath));
-} else {
-  console.warn("students route not found; skipping /api/students");
-}
+app.use("/api/students", require(studentsRoutePath));
 
 const teachersRoutePath = path.join(__dirname, "routes", "teachers.js");
 console.log("Loading teachers route from:", teachersRoutePath);
-if (fs.existsSync(teachersRoutePath)) {
-  app.use("/api/teachers", require(teachersRoutePath));
-} else {
-  console.warn("teachers route not found; skipping /api/teachers");
-}
+app.use("/api/teachers", require(teachersRoutePath));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
