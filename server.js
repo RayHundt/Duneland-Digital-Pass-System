@@ -27,6 +27,10 @@ const teachersRoutePath = path.join(__dirname, "routes", "teachers.js");
 console.log("Loading teachers route from:", teachersRoutePath);
 app.use("/api/teachers", require(teachersRoutePath));
 
+const passesRoutePath = path.join(__dirname, "routes", "passes.js");
+console.log("Loading passes route from:", passesRoutePath);
+app.use("/api/passes", require(passesRoutePath));
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
