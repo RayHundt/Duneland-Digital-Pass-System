@@ -3,10 +3,46 @@ const Pass = require("../models/Pass");
 
 const router = express.Router(); 
 
+function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 router.get("/", async (req, res) => {
     try {
-        const passes = await Pass.find();
+        const query = {};
+        const passIdInput = req.query.passId || req.query.passid;
+
+        if (passIdInput) {
+            const safePassId = escapeRegex(passIdInput.trim());
+            query.passId = { $regex: `^${safePassId}$`, $options: "i" };
+        }
+
+        if (req.query.status) {
+            const safeStatus = escapeRegex(req.query.status.trim());
+            query.status = { $regex: `^${safeStatus}$`, $options: "i" };
+        }
+
+        const passes = await Pass.find(query);
         res.json(passes);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.get("/:passId", async (req, res) => {
+    try{
+        const { passId } = req.params;
+        const safePassId = escapeRegex(passId.trim());
+        const pass = await Pass.findOne({
+            passId: { $regex: `^${safePassId}$`, $options: "i" }
+        });
+
+        if(!pass){
+            return res.status(404).json({ error: "Pass not found" });
+        }
+        
+        
+        return res.json(pass);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -41,11 +77,11 @@ router.post("/", async (req, res) => {
 router.patch("/:passId/status", async (req, res) => {
     try {
         const { passId } = req.params;
-        const { status: NextStatus } = req.body;
+        const { status: nextStatus } = req.body;
         
         const allowedStatuses = ["requested", "approved and in progress", "completed", "denied"];
 
-        if (!nextStatus || !allowedStatuses.includes(NextStatus)) {
+        if (!nextStatus || !allowedStatuses.includes(nextStatus)) {
             return res.status(400).json({ error: "Invalid or missing status" });    
         }
 
@@ -61,17 +97,17 @@ router.patch("/:passId/status", async (req, res) => {
             "denied": []
         };
 
-        if (!allowedTransitions[pass.status].includes(NextStatus)) {
-            return res.status(400).json({ error: "Invalid status transition", from: pass.status, to: NextStatus });
+        if (!allowedTransitions[pass.status].includes(nextStatus)) {
+            return res.status(400).json({ error: "Invalid status transition", from: pass.status, to: nextStatus });
         }
 
-        pass.status = NextStatus;
+        pass.status = nextStatus;
 
-        if (NextStatus === "approved and in progress" && !pass.approvedAt) {
+        if (nextStatus === "approved and in progress" && !pass.approvedAt) {
             pass.approvedAt = new Date();
         }
 
-        if (NextStatus === "completed" || nextStatus === "denied") {
+        if (nextStatus === "completed" || nextStatus === "denied") {
             pass.endedAt = new Date();
         }
 
