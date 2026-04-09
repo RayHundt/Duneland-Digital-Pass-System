@@ -8,6 +8,7 @@ const path = require("path");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 // Connect to MongoDB using the env var from your .env/.env.example
 connectDB(process.env.MONGODB_URI);
@@ -16,7 +17,7 @@ connectDB(process.env.MONGODB_URI);
   res.send("SERVER LEVEL students route works");
 });*/
 app.get("/", (req, res) => {
-  res.send("Digital Pass Backend Running");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 const studentsRoutePath = path.join(__dirname, "routes", "students.js");
