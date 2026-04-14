@@ -29,3 +29,16 @@ th{
 tbody tr:nth-child(even){
     background: #cfcfcf;
 }
+
+.status-requested{
+    background: #f2ff00;
+}
+.status-approved{
+    background: #00ff00;
+}
+.status-completed{
+    background: #0039b3;
+}
+.status-denied{
+    background: #ff0000;
+}
