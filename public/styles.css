@@ -1,5 +1,5 @@
 body{
-    font-family: Arial, Helveitca, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     background: #eeeeee;
     margin: 24px;
     color: #111111;
@@ -34,11 +34,24 @@ tbody tr:nth-child(even){
     background: #f2ff00;
 }
 .status-approved{
-    background: #00ff00;
+    background: #30f377;
 }
 .status-completed{
-    background: #0039b3;
+    background: #3958f3;
 }
 .status-denied{
     background: #ff0000;
+}
+
+.status-filters {
+    margin-bottom: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.status-filters button {
+    padding: 8px 12px;
+    border: 1px solid #333333;
+    background: #ffffff;
+    cursor: pointer;
 }

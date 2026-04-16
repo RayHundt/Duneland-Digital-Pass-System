@@ -12,6 +12,13 @@
     <h1>
         Digital Pass Admin Dashboard
     </h1>
+    <div class="status-filters">
+        <button data-status="">All</button>
+        <button data-status="requested">Requested</button>
+        <button data-status="approved and in progress">Approved-In Progress</button>
+        <button data-status="completed">Completed</button>
+        <button data-status="denied">Denied</button>
+    </div>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
             <tr>
@@ -28,6 +35,10 @@
                 </th>
 
                 <th>
+                    Student ID
+                </th>
+
+                <th>
                     From
                 </th>
 
@@ -41,6 +52,14 @@
 
                 <th>
                     Status
+                </th>
+
+                <th>
+                    Requested At
+                </th>
+
+                <th>
+                    Decided At
                 </th>
             </tr>
         </thead>
