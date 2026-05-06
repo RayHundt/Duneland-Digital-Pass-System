@@ -55,3 +55,47 @@ tbody tr:nth-child(even){
     background: #ffffff;
     cursor: pointer;
 }
+
+.status-filters button.active {
+    background: #58535341;
+}
+
+.page-card{
+    max-width:900px;
+    padding:18px;
+    border:2px solid #222222;
+    background:#d9d9d9;
+}
+
+.form-row{
+    margin-bottom:12px;
+    display:flex;
+    flex-direction:column;
+}
+
+.form-row.full-width{
+    width: 100%;
+}
+
+.form-actions{
+    display:flex;
+    gap:10px;
+}
+
+.message{
+    margin-top:12px;
+    padding:10px;
+    border-radius:4px;
+}
+
+.message.success{
+    background: #e7f7ea;
+    color: #1e6d2f;
+    border: 1px solid #1e6d2f;
+}
+
+.message.error{
+    background: #f9e7e7;
+    color: #8e1f1f;
+    border: 1px solid #8e1f1f;
+}

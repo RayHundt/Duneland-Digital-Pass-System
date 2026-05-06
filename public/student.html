@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">    
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>
+        Digital Pass Student Request
+    </title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="page-card">
+        <h1>
+            Digital Pass Student Request
+        </h1>
+
+        <form id="student-pas-form">
+            <div class="form-row">
+                <label>Name</label>
+                <input id="studentName" required />
+            </div>
+
+            <div class="form-row">
+                <label>Date</label>
+                <input id="requestDate" readonly />
+            </div>
+
+            <div class="form-row">
+                <label>From</label>
+                <select id="fromLocation" required></select>
+            </div>
+
+            <div class="form-row">
+                <label>To</label>
+                <select id="toLocation" required></select>
+            </div>
+
+            <div class="form-row full-width">
+                <label> Reason</label>
+                <textarea id="reason"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="trashButton">Trash</button>
+                <button type="submit" id="requestButton">Request</button>
+            </div>
+
+            <div id="form-message" class="message" hidden></div>
+        </form>
+    </div>
+    <script src="student.js"></script>
+</body>
+</html>

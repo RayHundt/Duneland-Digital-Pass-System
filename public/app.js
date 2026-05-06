@@ -22,6 +22,14 @@ function dateFormatter(dateString){
     }
 }
 
+function setActiveStatusFilter(selectedStatus) {
+    const buttons = document.querySelectorAll(".status-filters button");
+
+    buttons.forEach((button) => {
+        button.classList.toggle("active", button.getAttribute("data-status") === selectedStatus);
+    });
+}
+
 async function loadPasses(statusFilter = "") {
     try{
         const endpoint = statusFilter 
@@ -61,11 +69,13 @@ function setupStatusFilters(){
         button.addEventListener("click", () => {
             const selectedStatus = button.getAttribute("data-status");
             loadPasses(selectedStatus);
+            setActiveStatusFilter(selectedStatus);
         });
     });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     setupStatusFilters();
+    setActiveStatusFilter("");
     loadPasses();
 });
