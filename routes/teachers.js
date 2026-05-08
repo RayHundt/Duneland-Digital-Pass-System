@@ -60,7 +60,7 @@ router.get("/", async (req, res) => {
 });
 
 //seed route to add sample teachers to the database
-router.get("/seed", async (req, res) => {
+/*router.get("/seed", async (req, res) => {
     await Teacher.deleteMany({}); // Clear existing teachers
 
     const teachers = await Teacher.insertMany([
@@ -74,6 +74,6 @@ router.get("/seed", async (req, res) => {
     ]);
 
     res.json({ message: "Database seeded with sample teachers", teachers });
-});
+});*/
 
 module.exports = router;

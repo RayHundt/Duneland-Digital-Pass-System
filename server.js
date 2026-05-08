@@ -32,6 +32,10 @@ const passesRoutePath = path.join(__dirname, "routes", "passes.js");
 console.log("Loading passes route from:", passesRoutePath);
 app.use("/api/passes", require(passesRoutePath));
 
+const locationsRoutePath = path.join(__dirname, "routes", "locations.js");
+console.log("Loading locations route from:", locationsRoutePath);
+app.use("/api/locations", require(locationsRoutePath));
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
