@@ -6,24 +6,22 @@ const dateInput = document.getElementById("requestDate");
 const reasonInput = document.getElementById("reason");
 const messageEl = document.getElementById("form-message");
 
-function showMessage(text, type = "success") {
-    messageEl.textContent = text;
-    messageEl.className = `${type}-message`;
-    messageEl.hidden = false;
-}
-
 function clearMessage() {
     messageEl.hidden = true;
     messageEl.textContent = "";
 }
 
-function populateLocationSelect(selecetEl, locations){
-    selecetEl.innerHTML = "";
+function setToday() {
+    dateInput.value = new Date().toLocaleDateString();
+}
+
+function populateLocationSelect(selectEl, locations) {
+    selectEl.innerHTML = "";
 
     const placeHolder = document.createElement("option");
     placeHolder.value = "";
     placeHolder.textContent = "Select a location";
-    selecetEl.appendChild(placeholder);
+    selectEl.appendChild(placeHolder);
 
     const groupedLocations = locations.reduce((acc, loc) => {
         if (!acc[loc.department]) acc[loc.department] = [];
@@ -32,23 +30,38 @@ function populateLocationSelect(selecetEl, locations){
     }, {});
 
     Object.keys(groupedLocations).sort().forEach((department) => {
-        const grouped = document.createElement("optgroup");
-        grouped.label = department;
+        const group = document.createElement("optgroup");
+        group.label = department;
 
         groupedLocations[department].sort().forEach((room) => {
             const option = document.createElement("option");
             option.value = room;
             option.textContent = room;
-            grouped.appendChild(option);
-    });
+            group.appendChild(option);
+        });
 
-    selecetEl.appendChild(group);
+        selectEl.appendChild(group);
     });
+}
+
+async function loadLocations() {
+    try {
+        const response = await fetch("/api/locations");
+        if (!response.ok) {
+            throw new Error(`Failed to load locations (${response.status})`);
+        }
+
+        const locations = await response.json();
+        populateLocationSelect(fromSelect, locations);
+        populateLocationSelect(toSelect, locations);
+    } catch (error) {
+        console.error("Error loading locations:", error);
+    }
 }
 
 
 
 document.addEventListener("DOMContentLoaded", () => {
     setToday();
-    populateLocationOptions();
+    loadLocations();
 });

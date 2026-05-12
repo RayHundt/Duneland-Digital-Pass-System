@@ -39,7 +39,9 @@ router.get ("/seed", async (req, res) => {
             { department: "English", roomNumber: "E115" },
             { department: "English", roomNumber: "A102"},
             {department: "Art", roomNumber: "D309"},
-            {department: "History", roomNumber: "C547"}
+            {department: "History", roomNumber: "C547"},
+            {department: "Office", roomNumber: "Main Office"},
+            {department: "Office", roomNumber: "Nurse's Office"}
         ]);
 
         res.json({ message: "Database seeded with sample locations", locations });
