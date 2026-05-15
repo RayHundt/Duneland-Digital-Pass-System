@@ -52,6 +52,11 @@ router.get("/", async (req, res) => {
             }
         }
 
+         if (req.query.roomNumber) {
+            const safeNumber = escapeRegex(req.query.roomNumber.trim());
+            query.roomNumber = { $regex: `^${safeNumber}$`, $options: "i" };
+        }
+
         const teachers = await Teacher.find(query);
         res.json(teachers);
     } catch (err) {

@@ -50,6 +50,11 @@ router.get("/", async (req, res) => {
             }
         }
 
+        if (req.query.studentId) {
+            const safeId = escapeRegex(req.query.studentId.trim());
+            query.studentId = { $regex: `^${safeId}$`, $options: "i" };
+        }
+
         const students = await Student.find(query);
         res.json(students);
     } catch (err) {
