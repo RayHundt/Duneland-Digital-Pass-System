@@ -1,10 +1,11 @@
 const form = document.getElementById("student-pass-form");
 const studentIdInput = document.getElementById("studentId");
-const fromSelect = document.getElementById("fromTeacher");
-const toSelect = document.getElementById("toTeacher");
+const fromSelect = document.querySelector("select[name='fromTeacher']");
+const toSelect = document.querySelector("select[name='toTeacher']");
 const dateInput = document.getElementById("requestDate");
 const reasonInput = document.getElementById("reason");
 const messageEl = document.getElementById("form-message");
+let allTeachers = [];
 
 function clearMessage() {
     messageEl.hidden = true;
@@ -23,6 +24,8 @@ function populateTeacherSelect(selectEl, teachers) {
     placeHolder.textContent = "Select a teacher";
     selectEl.appendChild(placeHolder);
 
+    const fullName = teacher.firstName + " " + teacher.lastName;
+
     const groupedTeachers = teachers.reduce((acc, teacher) => {
         if (!acc[teacher.department]) acc[teacher.department] = [];
         acc[teacher.department].push(teacher);
@@ -34,10 +37,11 @@ function populateTeacherSelect(selectEl, teachers) {
         group.label = department;
 
         groupedTeachers[department].sort().forEach((teacher) => {
-            const option = document.createElement("option");
-            option.value = teacher._id;
-            option.textContent = `${teacher.firstName} ${teacher.lastName}`;
-            group.appendChild(option);
+            const fullName = `${teacher.firstName} ${teacher.lastName}`;
+            option.value = fullName;
+            option.dataset.teacherId = teacher._id;
+            option.textContent = fullName;
+
         });
 
         selectEl.appendChild(group);
@@ -58,6 +62,7 @@ async function loadTeachers() {
         }
 
         const teachers = await response.json();
+        allTeachers = teachers;
         populateTeacherSelect(fromSelect, teachers);
         populateTeacherSelect(toSelect, teachers);
     } catch (error) {
@@ -88,8 +93,8 @@ async function studentNameFromId(studentId) {
 
 async function locationFromTeacherName(fromSelect, toSelect) {
     try{
-        const fromResponse = await fetch(`/api/teachers?name=${encodeURIComponent(fromSelect)}`);
-        const toResponse = await fetch(`/api/teachers?name=${encodeURIComponent(toSelect)}`);
+        const fromResponse = await fetch(`/api/teachers?name=${encodeURIComponent(selectedFullName)}`);
+        const toResponse = await fetch(`/api/teachers?name=${encodeURIComponent(selectedFullName)}`);
         if (!fromResponse.ok || !toResponse.ok){
             throw new Error(`Failed to fetch teacher name (${fromResponse.status} / ${toResponse.status})`);
         }
@@ -121,7 +126,17 @@ form.addEventListener("submit", async (event) => {
         const fromTeacher = fromSelect.value;
         const toTeacher = toSelect.value;
         const reason = reasonInput.value.trim();
-        
+
+        const selectedFromOption = fromSelect.options[0];
+        const selectedToOption = toSelect.options[0];
+
+        const fromTeacher = allTeachers.find(t => t._id === selectedFromOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === fromTeacher.value.toLowerCase());
+        const toTeacher = allTeachers.find(t => t._id === selectedToOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === toTeacher.value.toLowerCase());
+
+        if(!fromTeacher || !toTeacher) {
+            throw new Error("Selected teacher(s) not found");
+        }
+
         const student = await studentNameFromId(studentId);
         const studentName = `${student.firstName} ${student.lastName}`;
 
@@ -133,10 +148,10 @@ form.addEventListener("submit", async (event) => {
             passId: `Pass-${Date.now()}`,
             studentId: studentId,
             studentName: studentName,
-            teacherId: teacherId,
-            teacherName: fromTeacherInfo.from.firstName + " " + fromTeacherInfo.from.lastName,
-            fromLocation: fromTeacherInfo.from.roomNumber,
-            toLocation: toTeacherInfo.to.roomNumber,
+            teacherId: fromTeacher._id,
+            teacherName: `${fromTeacherInfo.from.firstName} ${fromTeacherInfo.from.lastName}`,
+            fromLocation: fromTeacherInfo.roomNumber,
+            toLocation: toTeacherInfo.roomNumber,
             reason: reason || ""
         };
 
