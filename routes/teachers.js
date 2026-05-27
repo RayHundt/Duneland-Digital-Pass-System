@@ -7,13 +7,13 @@ function escapeRegex(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-//Filter teachers by subject and/or name (case-insensitive)
+//Filter teachers by department and/or name (case-insensitive)
 router.get("/", async (req, res) => {
     try {
         const query = {};
-        if (req.query.subject) {
-            const safeSubject = escapeRegex(req.query.subject.trim());
-            query.subject = { $regex: `^${safeSubject}$`, $options: "i" };
+        if (req.query.department) {
+            const safeDepartment = escapeRegex(req.query.department.trim());
+            query.department = { $regex: `^${safeDepartment}$`, $options: "i" };
         }
 
         const FirstNameInput = req.query.firstName || req.query.firstname;
@@ -65,20 +65,20 @@ router.get("/", async (req, res) => {
 });
 
 //seed route to add sample teachers to the database
-/*router.get("/seed", async (req, res) => {
+router.get("/seed", async (req, res) => {
     await Teacher.deleteMany({}); // Clear existing teachers
 
     const teachers = await Teacher.insertMany([
-        { teacherId: "T001", firstName: "John", lastName: "Doe", email: "jDoe@school.k12.us", subject: "Math", classes: ["Algebra", "Geometry"], roomNumber: "A521" },
-        { teacherId: "T002", firstName: "Jane", lastName: "Hutchinson", email: "jHutschinson@school.k12.us", subject: "English", classes: ["Literature", "Writing"], roomNumber: "A102" },
-        { teacherId: "T003", firstName: "Emily", lastName: "Ramber", email: "eRamber@school.k12.us", subject: "Science", classes: ["Biology", "Chemistry"], roomNumber: "C205" },
-        { teacherId: "T004", firstName: "Michael", lastName: "Laughner", email: "mLaughner@school.k12.us", subject: "History", classes: ["World History", "US History"], roomNumber: "C547" },
-        { teacherId: "T005", firstName: "Sarah", lastName: "Milkner", email: "sMilkner@school.k12.us", subject: "Art", classes: ["Drawing", "Painting"], roomNumber: "D309" },
-        { teacherId: "T006", firstName: "David", lastName: "Stithner", email: "dStithner@school.k12.us", subject: "Science", classes: ["Physics", "Biology"], roomNumber: "C235" },
-        { teacherId: "T007", firstName: "Martha", lastName: "Kinsley", email: "mKinsley@school.k12.us", subject: "English", classes: ["English 9", "World Literature"], roomNumber: "E115" }
+        { teacherId: "T001", firstName: "John", lastName: "Doe", email: "jDoe@school.k12.us",department: "Math", subjects: ["Algebra", "Geometry"], schedule:[{day: "Gold", period: "5", className: "Algebra"}], roomNumber: "A521" },
+        { teacherId: "T002", firstName: "Jane", lastName: "Hutchinson", email: "jHutschinson@school.k12.us", department: "English", subjects: ["Honors English 9", "English 9", "World Literature"], schedule:[{day: "Maroon", period: "3", className: "World Literature"}], roomNumber: "A102" },
+        { teacherId: "T003", firstName: "Emily", lastName: "Ramber", email: "eRamber@school.k12.us", department: "Science", subjects: ["Biology", "Chemistry"], schedule:[{day: "Maroon", period: "2", className: "Biology"}], roomNumber: "C205" },
+        { teacherId: "T004", firstName: "Michael", lastName: "Laughner", email: "mLaughner@school.k12.us", department: "History", subjects: ["World History", "US History"], schedule:[{day: "Gold", period: "7", className: "US History"}], roomNumber: "C547" },
+        { teacherId: "T005", firstName: "Sarah", lastName: "Milkner", email: "sMilkner@school.k12.us", department: "Art", subjects: ["Drawing", "Painting"], schedule:[{day: "Maroon", period: "1", className: "Drawing"}], roomNumber: "D309" },
+        { teacherId: "T006", firstName: "David", lastName: "Stithner", email: "dStithner@school.k12.us", department: "Science", subjects: ["Physics", "Biology"], schedule:[{day: "Gold", period: "6", className: "Physics"}], roomNumber: "C235" },
+        { teacherId: "T007", firstName: "Martha", lastName: "Kinsley", email: "mKinsley@school.k12.us", department: "English", subjects: ["English 9", "World Literature"], schedule:[{day: "Maroon", period: "3", className: "World Literature"}], roomNumber: "E115" }
     ]);
 
     res.json({ message: "Database seeded with sample teachers", teachers });
-});*/
+});
 
 module.exports = router;

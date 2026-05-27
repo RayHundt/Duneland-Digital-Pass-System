@@ -1,7 +1,7 @@
 const form = document.getElementById("student-pass-form");
 const studentIdInput = document.getElementById("studentId");
-const fromSelect = document.querySelector("select[name='fromTeacher']");
-const toSelect = document.querySelector("select[name='toTeacher']");
+const fromSelect = document.getElementById("fromTeacher");
+const toSelect = document.getElementById("toTeacher");
 const dateInput = document.getElementById("requestDate");
 const reasonInput = document.getElementById("reason");
 const messageEl = document.getElementById("form-message");
@@ -24,8 +24,6 @@ function populateTeacherSelect(selectEl, teachers) {
     placeHolder.textContent = "Select a teacher";
     selectEl.appendChild(placeHolder);
 
-    const fullName = teacher.firstName + " " + teacher.lastName;
-
     const groupedTeachers = teachers.reduce((acc, teacher) => {
         if (!acc[teacher.department]) acc[teacher.department] = [];
         acc[teacher.department].push(teacher);
@@ -37,11 +35,12 @@ function populateTeacherSelect(selectEl, teachers) {
         group.label = department;
 
         groupedTeachers[department].sort().forEach((teacher) => {
+            const option = document.createElement("option");
             const fullName = `${teacher.firstName} ${teacher.lastName}`;
             option.value = fullName;
             option.dataset.teacherId = teacher._id;
             option.textContent = fullName;
-
+            group.appendChild(option);
         });
 
         selectEl.appendChild(group);
@@ -91,47 +90,22 @@ async function studentNameFromId(studentId) {
     }
 }
 
-async function locationFromTeacherName(fromSelect, toSelect) {
-    try{
-        const fromResponse = await fetch(`/api/teachers?name=${encodeURIComponent(selectedFullName)}`);
-        const toResponse = await fetch(`/api/teachers?name=${encodeURIComponent(selectedFullName)}`);
-        if (!fromResponse.ok || !toResponse.ok){
-            throw new Error(`Failed to fetch teacher name (${fromResponse.status} / ${toResponse.status})`);
-        }
-
-        const fromTeachers = await fromResponse.json();
-        const toTeachers = await toResponse.json();
-
-        if (fromTeachers.length === 0) {
-            throw new Error("No teacher found with that name");
-        }
-
-        if (toTeachers.length === 0) {
-            throw new Error("No teacher found with that name");
-        }
-
-    return { from: fromTeachers[0], to: toTeachers[0] };
-
-    } catch (error) {
-    console.error("Error fetching teacher name:", error);
-    throw error;
-    }
-}
+//Old function: locationFromTeacherId(teacherId) is no longer used because the information is now obtained from the cached teacher objects when resolving the "from" teacher in the form submission handler
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage();
     try {  
         const studentId = studentIdInput.value.trim();
-        const fromTeacher = fromSelect.value;
-        const toTeacher = toSelect.value;
+        const fromTeacherObject = fromSelect.options[fromSelect.selectedIndex];
+        const toTeacherObject = toSelect.options[toSelect.selectedIndex];
         const reason = reasonInput.value.trim();
 
-        const selectedFromOption = fromSelect.options[0];
-        const selectedToOption = toSelect.options[0];
+        const selectedFromOption = fromSelect.options[fromSelect.selectedIndex];
+        const selectedToOption = toSelect.options[toSelect.selectedIndex];
 
-        const fromTeacher = allTeachers.find(t => t._id === selectedFromOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === fromTeacher.value.toLowerCase());
-        const toTeacher = allTeachers.find(t => t._id === selectedToOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === toTeacher.value.toLowerCase());
+        const fromTeacher = allTeachers.find(t => t._id === selectedFromOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === fromTeacherObject.value.toLowerCase());
+        const toTeacher = allTeachers.find(t => t._id === selectedToOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === toTeacherObject.value.toLowerCase());
 
         if(!fromTeacher || !toTeacher) {
             throw new Error("Selected teacher(s) not found");
@@ -140,18 +114,17 @@ form.addEventListener("submit", async (event) => {
         const student = await studentNameFromId(studentId);
         const studentName = `${student.firstName} ${student.lastName}`;
 
-        const fromTeacherInfo = await locationFromTeacherName(fromTeacher);
-        const toTeacherInfo = await locationFromTeacherName(toTeacher);
-        const teacherId = fromTeacherInfo.from._id;
+        // Use the cached teacher objects we already resolved above
+        const teacherId = fromTeacher._id;
 
         const payload = {
             passId: `Pass-${Date.now()}`,
             studentId: studentId,
             studentName: studentName,
             teacherId: fromTeacher._id,
-            teacherName: `${fromTeacherInfo.from.firstName} ${fromTeacherInfo.from.lastName}`,
-            fromLocation: fromTeacherInfo.roomNumber,
-            toLocation: toTeacherInfo.roomNumber,
+            teacherName: `${fromTeacher.firstName} ${fromTeacher.lastName}`,
+            fromLocation: fromTeacher.roomNumber,
+            toLocation: toTeacher.roomNumber,
             reason: reason || ""
         };
 
@@ -167,7 +140,7 @@ form.addEventListener("submit", async (event) => {
             throw new Error(result.error || "Failed to submit pass request");
         }
 
-        form.requestFullscreen();
+        form.reset();
         setToday();
         showMessage(`Pass ${result.passId} created successfully!`, "success");
 
