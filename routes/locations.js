@@ -3,10 +3,34 @@ const Location = require("../models/Location");
 
 const router = express.Router();
 
+/**
+ * Escape user input when constructing RegExp queries for Mongo.
+ * Helpful for safely supporting case-insensitive filtering from query params.
+ */
+// Escapes special regex characters in a string
 function escapeRegex(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** 
+ * Locations API
+ *
+ * GET /api/locations
+ * Query params (optional):
+ *  - department (string)
+ *  - roomNumber (string)
+ * Response: 200 OK -> Array of location objects
+ * Example: GET /api/locations?department=Science
+ * Example response: [{ department: "Science", roomNumber: "C205" }]
+ *
+ * Seed route (commented out): GET /api/locations/seed
+ *   - WARNING: the seed route clears existing locations before inserting sample data
+ * Response codes:
+ *  - 200 OK -> array
+ *  - 500 Internal Server Error
+*/
+
+// Fetches the locations based on the department and/or room number (case-insensitive) by querying the database. If no query parameters are provided, it returns all locations.
 router.get("/", async (req, res) => {
     try {
         const query = {};
@@ -28,7 +52,8 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get ("/seed", async (req, res) => {
+// Seeds the database with sample locations for testing purposes. It first clears any existing locations and then inserts a predefined set of locations into the database.
+/*router.get ("/seed", async (req, res) => {
     try {
         await Location.deleteMany({}); // Clear existing locations
 
@@ -48,6 +73,6 @@ router.get ("/seed", async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-});
+});*/
 
 module.exports = router;

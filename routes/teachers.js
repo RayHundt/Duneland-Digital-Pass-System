@@ -3,11 +3,35 @@ const Teacher = require("../models/Teacher");
 
 const router = express.Router();
 
+/**
+ * Escape user-provided input to safely include in a RegExp pattern.
+ * Use when building case-insensitive Mongo regex queries from query params.
+ */
+// Escapes special regex characters in a string
 function escapeRegex(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-//Filter teachers by department and/or name (case-insensitive)
+/** 
+ * Teachers API
+ *
+ * GET /api/teachers
+ * Query params (optional):
+ *  - department (string): exact department match (case-insensitive)
+ *  - name / firstName / lastName: search by name (partial or full)
+ *  - roomNumber: exact room number (case-insensitive)
+ * Response: 200 OK -> Array of teacher objects
+ * Example: GET /api/teachers?department=Science
+ * Example response: [{ teacherId: "T003", firstName: "Emily", lastName: "Ramber", department: "Science", subjects: ["Biology","Chemistry"], roomNumber: "C205" }]
+ *
+ * Seed route (commented out): GET /api/teachers/seed
+ *   - WARNING: the seed route clears existing teachers before inserting sample data
+ * Response codes:
+ *  - 200 OK -> array (or single object depending on endpoint)
+ *  - 500 Internal Server Error
+*/
+
+//Filter teachers by department and/or name (case-insensitive) by querying the database. If no query parameters are provided, it returns all teachers.  The name can be provided as firstName, lastName, or name (which can be a full name or partial name).  If just the firstName or lastName is given, it will return any teacher with that first or last name.  If a full name is given, it will return any teacher with that first and last name.  If a partial name is given, it will return any teacher with that partial name in either the first or last name.
 router.get("/", async (req, res) => {
     try {
         const query = {};
@@ -64,8 +88,10 @@ router.get("/", async (req, res) => {
     }
 });
 
-//seed route to add sample teachers to the database
-router.get("/seed", async (req, res) => {
+// Seeds the database with sample teachers for testing purposes. It first clears any existing teachers and then inserts a predefined set of teachers into the database.
+// TODO: Instead of deleting data during seeding, consider using migrations
+// or a safe seed strategy to avoid accidental data loss in non-dev environments.
+/*router.get("/seed", async (req, res) => {
     await Teacher.deleteMany({}); // Clear existing teachers
 
     const teachers = await Teacher.insertMany([
@@ -79,6 +105,6 @@ router.get("/seed", async (req, res) => {
     ]);
 
     res.json({ message: "Database seeded with sample teachers", teachers });
-});
+});*/
 
 module.exports = router;

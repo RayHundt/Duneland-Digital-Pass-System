@@ -7,15 +7,31 @@ const reasonInput = document.getElementById("reason");
 const messageEl = document.getElementById("form-message");
 let allTeachers = [];
 
+/** 
+ * Clears the message displayed in the UI. It hides the message element and resets its text content to an empty string. 
+*/
 function clearMessage() {
     messageEl.hidden = true;
     messageEl.textContent = "";
 }
 
+/** 
+ * Sets the date input field to today's date using the runtime locale.
+ * Called on page load to pre-fill the date field in the pass form.
+ * Note: the displayed format depends on the user's locale (uses `toLocaleDateString`).
+*/
 function setToday() {
     dateInput.value = new Date().toLocaleDateString();
 }
 
+/** 
+ * Populates the teacher selection dropdown with the provided list of teachers.
+ * @param {HTMLSelectElement} selectEl - The select element to populate (e.g., fromSelect or toSelect).
+ * @param {Array<Object>} teachers - An array of teacher objects (expects { firstName, lastName, department, _id, roomNumber }).
+ * Side effects:
+ *  - Groups options by `department` using <optgroup> labels.
+ *  - Sets `option.dataset.teacherId` to the teacher's canonical `_id` (used as the primary key on submit).
+*/
 function populateTeacherSelect(selectEl, teachers) {
     selectEl.innerHTML = "";
 
@@ -47,12 +63,20 @@ function populateTeacherSelect(selectEl, teachers) {
     });
 }
 
+/** 
+ * Displays a message in the UI with the specified text and type.
+ * @param {string} text - The message text to display.
+ * @param {string} type - The type of message to display (e.g., "success", "error")
+*/
 function showMessage(text, type = "success"){
     messageEl.textContent = text;
     messageEl.className = `message ${type}`;
     messageEl.hidden = false;
 }
 
+/** 
+ * Fetches the list of teachers from the server and populates the "from" and "to" teacher selection dropdowns in the pass form. It also caches the list of teachers for later use when resolving teacher IDs during form submission. 
+*/
 async function loadTeachers() {
     try {
         const response = await fetch("/api/teachers");
@@ -69,6 +93,11 @@ async function loadTeachers() {
     }
 }
 
+/** 
+ * When the form is submitted, this function resolves the student's name based on their ID to be displayed in the admin view and to satisfy the requirements of a new pass.
+ * @param {string} studentId - The ID of the student.
+ * @returns {Promise<Object>} - A promise resolving to the student object.
+ */
 async function studentNameFromId(studentId) {
     try{
         const response = await fetch(`/api/students?studentId=${encodeURIComponent(studentId)}`);
@@ -92,6 +121,18 @@ async function studentNameFromId(studentId) {
 
 //Old function: locationFromTeacherId(teacherId) is no longer used because the information is now obtained from the cached teacher objects when resolving the "from" teacher in the form submission handler
 
+/** 
+ * Handles the form submission for creating a new pass.
+ * - Validates inputs and resolves the student via `studentNameFromId`.
+ * - Resolves `fromTeacher`/`toTeacher` from the cached `allTeachers` array.
+ *   (Primary lookup uses `option.dataset.teacherId`; falls back to full-name match.)
+ * - Constructs the payload expected by `POST /api/passes` and sends it.
+ * - Side effects: resets the form and shows a success or error message via `showMessage()`.
+ * Payload shape:
+ * {
+ *   passId, studentId, studentName, teacherId, teacherName, fromLocation, toLocation, reason?
+ * }
+*/
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage();
@@ -104,7 +145,10 @@ form.addEventListener("submit", async (event) => {
         const selectedFromOption = fromSelect.options[fromSelect.selectedIndex];
         const selectedToOption = toSelect.options[toSelect.selectedIndex];
 
+        // TODO: Ambiguous-name fallback is fragile. Prefer dataset.teacherId always
+        // and surface an error if multiple teachers share the same display name.
         const fromTeacher = allTeachers.find(t => t._id === selectedFromOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === fromTeacherObject.value.toLowerCase());
+        // TODO: Consider validating that `toTeacher` exists and is different from `fromTeacher`.
         const toTeacher = allTeachers.find(t => t._id === selectedToOption?.dataset?.teacherId) || allTeachers.find(t => (`${t.firstName} ${t.lastName}`).toLowerCase() === toTeacherObject.value.toLowerCase());
 
         if(!fromTeacher || !toTeacher) {
