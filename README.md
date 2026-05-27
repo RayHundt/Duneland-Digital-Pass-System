@@ -67,15 +67,15 @@ I led the backend and database development for this project, including:
 
 # Technologies Used
 
-## Layer        ## Technology
-Runtime           Node.js
-Framework         Express 5
-Database          MongoDB + Mongoose
-Authentication    JSON Web Tokens + bcrypt
-Real-time         Socket.io
-Configuration     dotenv
-Dev Tooling       Nodemon
-
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js |
+| Framework | Express 5 | 
+| Database | MongoDB + Mongoose |
+| Authentication | JSON Web Tokens + bcrypt |
+| Real-time | Socket.io | 
+| Configuration | dotenv |
+| Dev Tooling | Nodemon |
 
 ---
 
