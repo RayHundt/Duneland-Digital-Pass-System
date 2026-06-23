@@ -169,7 +169,7 @@ Additional project planning and future goals can be found in `ROADMAP.md`.
 
 # Contributors
 
-- Ray Hundt
+- Ray Hundt (Fall 2025-Spring 2026)
 - [Add future contributors here]
 
 ---
