@@ -3,69 +3,39 @@
 A web-based digital hall pass system designed for use in a high school environment.  
 The goal of this project is to modernize student hall passes by replacing paper passes with a centralized digital system for teachers and administrators.
 
----
-
-# Project Overview
-
-This project currently includes:
-- A Node.js + Express backend server
-- MongoDB database integration
-- Student, teacher, pass, and location data models
-- API routes with filtering functionality
-- Project structure for future expansion
-
-The project is intended to continue development after the original developers graduate.
+This project is designed for long-term, student-maintained development. Each contributor builds on the work of those before them.
 
 ---
+# Project Status
 
-# My Role
-
-I led the backend and database development for this project, including:
-- Express.js server setup
-- MongoDB configuration
-- API route creation
-- Database model design
-- GitHub version control setup
-- Initial project architecture
-- Documentation
+This project is currently in active development and serves as the foundation for a larger digital hall pass management system.
 
 ---
+# Table of Contents
 
-# Features
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Application](#running-the-application)
+- [API Reference](#api-reference)
+- [Current Features](#current-features)
+- [Planned Features](#planned-features)
+- [Contributing](#contributing)
+- [Contributors](#contributors)
+- [Educational Purpose](#educational-purpose)
+- [License](#license)
 
-## Current Features
+---
+# Overview
 
-- Student database model
-- Teacher database model
-- Pass database model
-- Location database model
-- REST API backend
-- Filtering students by:
-  - name
-  - grade
-  - studentId
-- Filtering teachers by:
-  - name
-  - subject
-  - roomNumber
-- Filtering locations by:
-  - department
-  - roomNumber
-- Environment variable configuration
-- Organized project structure
-
-## Planned Features
-
-- Digital pass creation
-- Teacher approval system
-- Authentication/login system
-- Frontend interface for teachers 
-   - Improve the admin interface
-- Real-time pass tracking
+The Duneland Digital Pass system provides a backend API for managing digital hall passes in school.  The system has models for teachers, students, passes, and different classrooms/locations and uses filters to answer specific queries for each.  It is built to be scalable by future students with infrastructure in place for implementation.
 
 ---
 
-# Technologies Used
+# Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -79,8 +49,8 @@ I led the backend and database development for this project, including:
 
 ---
 
-# File Structure
-
+# Project Structure 
+```
 Duneland-Digital-Pass-System/
 ├── config/
 │   └── db.js           # MongoDB connection helper
@@ -104,77 +74,135 @@ Duneland-Digital-Pass-System/
 ├── .env.example        # Environment variable template
 ├── ROADMAP.md          # Development roadmap and contributor guidance
 └── package.json
+```
+---
+# Prerequisites
 
+- Node.js v16 or higher
+- A running MongoDB instance (could be local or MongoDB Atlas)
 
 ---
-
 # Installation
 
-## 1. Install Dependencies
-
 ```bash
+git clone https://github.com/RayHundt/Duneland-Digital-Pass-System.git
+cd Duneland-Digital-Pass-System
 npm install
 ```
+---
+# Configuration
 
-## 2. Create `.env` File
-
-Example:
-
-```env
-MONGO_URI=your_connection_string
-PORT=3000
+```bash
+cp .env.example .env
 ```
+| Variable | Description |
+|---|---|
+| MONGODB_URI | MongoDB connection string |
+| PORT | Port the server listens on (default is 3000) | 
+| JWT_SECRET | Secret key for signing JWT tokens -- use a strong and random value |
 
-## 3. Start Server
+---
+# Running the Application
+Production:
 
 ```bash
 npm start
 ```
-
-or
+Development:
 
 ```bash
 npm run dev
 ```
+Successful startup:
+
+MongoDB connected
+Server running on port 3000
 
 ---
+# API Reference
 
-# API Routes
-
-## Students
+## Students -- /api/students
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/students` | Get all students |
 | GET | `/api/students?name=` | Filter students by name |
 | GET | `/api/students?grade=` | Filter students by grade |
+| GET | `/api/students?studentId=` | Filter students by ID |
 
-## Teachers
+## Teachers -- /api/teachers
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/teachers` | Get all teachers |
 | GET | `/api/teachers?name=` | Filter teachers by name |
 | GET | `/api/teachers?subject=` | Filter teachers by subject |
+| GET | `/api/teachers?roomNumber` | Filter teachers by room number |
+
+## Locations -- /api/locations
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/locations` | Get all locations |
+| GET | `/api/locations?department=` | Filter locations by department |
+| GET | `/api/locations?roomNumber=` | Filter locations by room number |
+
+## Passes -- /api/passes
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/passes` | Get all passes |
+
+----
+# Current Features
+
+- Student, Teacher, Pass, and Locations database models
+- RESTful  API backend with query filtering across all models
+- Environment variable configuration
+- Express 5 server with CORS and JSON middleware
+- MongoDB connection helper with startup error handling
+- Static frontend interface served from /public
+- JWT and bcrypt authentication dependencies installed and ready for implementation
+- Socket.io infrastructure installed and ready to be implemented
 
 ---
 
-# Project Status
+# Planned Features
 
-This project is currently in active development and serves as the foundation for a larger digital hall pass management system.
+- Digital pass creation and lifetime management with "requested", "approved and in progress", "completed", and "denied" statuses 
+- Teacher approval and notification system
+- Authentication/login and role-based access system
+- Expanded and improved frontend UI
+- Real-time pass tracking with Socket.io
+- Improved Admin dashboard to manage passes
 
-Additional project planning and future goals can be found in `ROADMAP.md`.
+Roadmap.md has a full breakdown of planned work and guidance for future contributors
 
 ---
+# Contributing
+Please read Roadmap.md before contributing.  It contains important context on the project's current state, architecture decisions, and suggested next steps.
 
+1. Create a feature branch: git checkout -b feature/your-feature
+2. Commit your changes with clear, descriptive messages
+3. Push your branch and open a pull request
+4. Document any new endpoints, models, or environment variables
+5. Update Roadmap.md to reflect what you built
+
+---
 # Contributors
 
-- Ray Hundt (Fall 2025-Spring 2026)
-- [Add future contributors here]
+| Contributor | Term | Contributions |
+|---|---|---|
+| Ray Hundt | Fall 2025 - Spring 2026 | Project founder -- server architecture, database models, REST Api, frontend scaffolding, environment configuration, initial project documentation
 
 ---
 
 # Educational Purpose
 
 This project was developed as a software engineering and web development learning experience while also creating a potentially useful tool for school administration.
+
+---
+# License
+ISC
+---
 
